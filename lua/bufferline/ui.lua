@@ -240,6 +240,7 @@ end
 ---@param style string
 ---@return boolean
 local function is_slant(style)
+  if type(style) == "table" then return #style == 3 and style[3] == true end
   return vim.tbl_contains({ sep_names.slant, sep_names.padded_slant, sep_names.slope, sep_names.padded_slope }, style)
 end
 
@@ -248,10 +249,14 @@ end
 --- @param focused boolean
 --- @param style table | string
 local function get_separator(focused, style)
-  if type(style) == "table" then return focused and style[1] or style[2] end
   ---@diagnostic disable-next-line: undefined-field
   local chars = sep_chars[style] or sep_chars.thin
-  if is_slant(style) then return chars[1], chars[2] end
+  if is_slant(style) then
+    if type(style) == "table" then
+      return style[1], style[2]
+    end
+    return chars[1], chars[2]
+  end
   return focused and chars[1] or chars[2]
 end
 
